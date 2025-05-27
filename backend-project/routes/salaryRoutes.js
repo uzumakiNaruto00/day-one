@@ -6,9 +6,19 @@ const {
   createSalary,
   getPayrollReport
 } = require('../controllers/salaryController');
+const { protect, authorize } = require('../middleware/auth');
 
-router.route('/').get(getSalaries).post(createSalary);
-router.route('/employee/:id').get(getSalariesByEmployee);
-router.route('/report').get(getPayrollReport);
+// All routes are protected
+router.use(protect);
 
-module.exports = router; 
+router.route('/')
+  .get(getSalaries)
+  .post(authorize('admin'), createSalary);
+
+router.route('/employee/:id')
+  .get(getSalariesByEmployee);
+
+router.route('/report')
+  .get(authorize('admin'), getPayrollReport);
+
+module.exports = router;
